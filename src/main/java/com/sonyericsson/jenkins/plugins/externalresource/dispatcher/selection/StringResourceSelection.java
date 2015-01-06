@@ -39,6 +39,7 @@ import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.data.Externa
 import static com.sonyericsson.jenkins.plugins.externalresource.dispatcher.Constants.
         STRING_RESOURCE_SELECTION_SEPARATOR_WITH_ESCAPE;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import hudson.EnvVars;
 
 /**
  * A Selection Criteria value of the type String.
@@ -99,12 +100,16 @@ public class StringResourceSelection extends AbstractResourceSelection {
 
     }
     @Override
-    public boolean equalToExternalResourceValue(ExternalResource externalResource) {
+    public boolean equalToExternalResourceValue(ExternalResource externalResource, EnvVars envVars) {
         String[] path = name.split(STRING_RESOURCE_SELECTION_SEPARATOR_WITH_ESCAPE);
         Metadata externalResourceValue = TreeStructureUtil.getLeaf(externalResource, path);
+        String expandedValue = value;
+        if (envVars != null) {
+            expandedValue = envVars.expand(value);
+        }
         if (externalResourceValue != null) {
             Object tmpValue = externalResourceValue.getValue();
-            if (tmpValue != null && value.equals(tmpValue.toString())) {
+            if (tmpValue != null && expandedValue.equals(tmpValue.toString())) {
                 return true;
             }
         }

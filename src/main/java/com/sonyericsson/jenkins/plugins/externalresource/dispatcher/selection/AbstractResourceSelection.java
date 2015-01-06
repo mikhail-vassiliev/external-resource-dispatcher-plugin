@@ -32,6 +32,7 @@ import java.io.Serializable;
 import org.kohsuke.stapler.export.ExportedBean;
 
 import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.data.ExternalResource;
+import hudson.EnvVars;
 
 
 
@@ -54,5 +55,5 @@ public abstract class AbstractResourceSelection implements Serializable, Describ
      * @param externalResource the External Resource
      * @return true if resource selection equals to ExternalResource leaf value
      */
-    public abstract boolean equalToExternalResourceValue(ExternalResource externalResource);
+    public abstract boolean equalToExternalResourceValue(ExternalResource externalResource, EnvVars envVars);
 }

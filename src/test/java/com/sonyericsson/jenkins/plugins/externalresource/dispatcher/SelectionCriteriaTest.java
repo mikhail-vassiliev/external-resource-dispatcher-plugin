@@ -29,6 +29,7 @@ import java.util.List;
 
 import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.selection.AbstractResourceSelection;
 import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.selection.StringResourceSelection;
+import hudson.EnvVars;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -64,7 +65,8 @@ public class SelectionCriteriaTest {
         TreeStructureUtil.addValue(er2, "Hallon", "description", "product", "label", "name");
         TreeStructureUtil.addValue(er2, "Orange", "description", "sim", "operator");
         availableResourceList.add(er2);
-        List<ExternalResource> matchingResources = sc.getMatchingResources(availableResourceList);
+        EnvVars envVars = null;
+        List<ExternalResource> matchingResources = sc.getMatchingResources(availableResourceList, envVars);
         Assert.assertEquals(1, matchingResources.size());
         Assert.assertEquals("Anzu", TreeStructureUtil.getPath(matchingResources.get(0), "product", "label", "name")
                 .getValue());

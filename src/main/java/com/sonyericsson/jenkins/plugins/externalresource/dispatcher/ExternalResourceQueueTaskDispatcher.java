@@ -35,11 +35,15 @@ import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.data.veto.Be
 import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.utils.AdminNotifier;
 import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.utils.AvailabilityFilter;
 import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.utils.resourcemanagers.ExternalResourceManager;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.matrix.MatrixConfiguration;
 import hudson.model.AbstractProject;
 import hudson.model.Node;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
 import hudson.model.Queue;
+import hudson.model.StringParameterValue;
 import hudson.model.queue.CauseOfBlockage;
 import hudson.model.queue.QueueTaskDispatcher;
 import jenkins.model.Jenkins;
@@ -100,8 +104,24 @@ public class ExternalResourceQueueTaskDispatcher extends QueueTaskDispatcher {
             logger.exiting("ExternalResourceQueueTaskDispatcher", "canTake", "BecauseNoAvailableResources-2");
             return new BecauseNoAvailableResources(node);
         }
+        
+        ParametersAction buildParameters = item.getAction(ParametersAction.class);
+        EnvVars envVars = null;
+        if (buildParameters != null) {
+            Iterator<ParameterValue> iterator = buildParameters.iterator();
+            while (iterator.hasNext()) {
+                ParameterValue parameterValue = iterator.next();
+                if (StringParameterValue.class.isInstance(parameterValue)) {
+                    StringParameterValue stringParameter = (StringParameterValue)parameterValue;
+                    if (envVars == null) {
+                        envVars = new EnvVars();
+                    }
+                    envVars.override(stringParameter.getName(), stringParameter.value);
+                }
+            }
+        }
 
-        resources = selectionCriteria.getMatchingResources(resources);
+        resources = selectionCriteria.getMatchingResources(resources, envVars);
 
         if (resources == null || resources.isEmpty()) {
             //No matching resources, block the build on this node.

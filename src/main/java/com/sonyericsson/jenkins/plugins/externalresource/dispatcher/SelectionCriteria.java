@@ -57,6 +57,7 @@ import com.sonyericsson.jenkins.plugins.externalresource.dispatcher.data.Externa
 
 import static com.sonyericsson.jenkins.plugins.externalresource.dispatcher.Constants.BUILD_LOCKED_RESOURCE_NAME;
 import static com.sonyericsson.jenkins.plugins.externalresource.dispatcher.Constants.getBuildLockedResourceParentPath;
+import hudson.EnvVars;
 
 
 /**
@@ -120,13 +121,13 @@ public class SelectionCriteria extends JobProperty<AbstractProject<?, ?>> {
      *            available resources list.
      * @return the matching resource list if exists.
      */
-    public List<ExternalResource> getMatchingResources(List<ExternalResource> availableResourceList) {
+    public List<ExternalResource> getMatchingResources(List<ExternalResource> availableResourceList, EnvVars envVars) {
         List<ExternalResource> matchingResourceList = new LinkedList<ExternalResource>();
         boolean foundFlag = true;
         for (ExternalResource er : availableResourceList) {
             foundFlag = true;
             for (AbstractResourceSelection resourceSelection : resourceSelectionList) {
-                if (!resourceSelection.equalToExternalResourceValue(er)) {
+                if (!resourceSelection.equalToExternalResourceValue(er, envVars)) {
                     foundFlag = false;
                     break;
                 }
